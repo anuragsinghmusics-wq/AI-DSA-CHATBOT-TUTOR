@@ -23,7 +23,7 @@ async function getDevUserId(): Promise<string> {
     );
   }
   DEV_USER_ID = user.id;
-  return DEV_USER_ID;
+  return DEV_USER_ID!;
 }
 
 /**
@@ -58,7 +58,7 @@ export class ChatService {
 
       // 3. Get recent chat history for context window
       const recentMessages = await chatRepository.getRecentMessages(sessionId, 10);
-      const chatHistory: ChatMessageData[] = recentMessages.map((msg) => ({
+      const chatHistory: ChatMessageData[] = recentMessages.map((msg: any) => ({
         id: msg.id,
         sessionId: msg.sessionId,
         role: msg.role as ChatMessageData['role'],
