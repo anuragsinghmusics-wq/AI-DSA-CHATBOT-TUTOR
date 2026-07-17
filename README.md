@@ -5,7 +5,7 @@
 ## Architecture
 
 ```
-User → Frontend (Next.js) → Express API → LangGraph Pipeline → Ollama (Qwen3 8B)
+User → Frontend (Next.js) → Express API → LangGraph Pipeline → Gemini 2.5 Flash
                                               ↓
                               Intent Classifier → Prompt Builder → Context Injector
                                                                         ↓
@@ -26,30 +26,17 @@ User → Frontend (Next.js) → Express API → LangGraph Pipeline → Ollama (Q
 | Frontend | Next.js 14, TypeScript, TailwindCSS |
 | Backend | Node.js, Express, TypeScript |
 | AI Engine | LangChain.js, LangGraph.js |
-| LLM | Qwen3 8B via Ollama |
-| Database | PostgreSQL (Prisma ORM) |
-| Cache | Redis |
-| Vector DB | Qdrant (RAG-ready) |
+| LLM | Gemini 2.5 Flash |
+| Database | SQLite (Prisma ORM) |
+| Vector DB | FAISS |
 
 ## Prerequisites
 
 - **Node.js** 18+
-- **Docker** & Docker Compose
-- **Ollama** ([install from ollama.com](https://ollama.com))
 
 ## Quick Start
 
-### 1. Start Infrastructure
-```bash
-docker-compose up -d
-```
-
-### 2. Pull the LLM Model
-```bash
-ollama pull qwen3:8b
-```
-
-### 3. Setup Backend
+### 1. Setup Backend
 ```bash
 cd backend
 cp ../.env.example .env
@@ -59,14 +46,14 @@ npm run db:seed
 npm run dev
 ```
 
-### 4. Setup Frontend
+### 2. Setup Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### 5. Open the App
+### 3. Open the App
 Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## API Endpoints
@@ -95,29 +82,20 @@ deebug-chatbot/
 │       ├── lib/       # API client
 │       └── types/     # TypeScript types
 │
-├── backend/           # Express Server
-│   └── src/
-│       ├── ai/
-│       │   ├── graph/
-│       │   │   ├── nodes/  # 7 LangGraph nodes
-│       │   │   ├── state.ts
-│       │   │   └── workflow.ts
-│       │   ├── prompts/    # System, Intent, Teacher, Judge
-│       │   ├── safety/     # Regex, Heuristic, Validator
-│       │   └── llm/        # Ollama client
-│       ├── config/         # DB, Redis, Env
-│       ├── controllers/
-│       ├── services/
-│       ├── repositories/
-│       ├── middleware/
-│       └── routes/
-│
-└── docker-compose.yml
+└── backend/           # Express Server
+    └── src/
+        ├── ai/
+        │   ├── graph/
+        │   │   ├── nodes/  # 7 LangGraph nodes
+        │   │   ├── state.ts
+        │   │   └── workflow.ts
+        │   ├── prompts/    # System, Intent, Teacher, Judge
+        │   ├── safety/     # Regex, Heuristic, Validator
+        │   └── llm/        # LLM clients
+        ├── config/         # DB, Env
+        ├── controllers/
+        ├── services/
+        ├── repositories/
+        ├── middleware/
+        └── routes/
 ```
-
-## Future Enhancements (RAG-Ready)
-
-The Context Injector node is designed to integrate with Qdrant. When ready:
-1. Index concept libraries, hints, and editorials into Qdrant
-2. Enable the RAG pipeline in `contextInjector.ts`
-3. No other changes needed — the architecture supports it seamlessly
