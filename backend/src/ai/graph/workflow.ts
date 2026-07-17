@@ -225,7 +225,7 @@ export async function* runTutorPipeline(input: {
       const nodeNames = Object.keys(chunk);
 
       for (const nodeName of nodeNames) {
-        const nodeOutput = chunk[nodeName] as Partial<TutorGraphStateType>;
+        const nodeOutput = (chunk as Record<string, any>)[nodeName] as Partial<TutorGraphStateType>;
 
         // Yield intent as soon as the classifier finishes — gives immediate feedback
         if (nodeName === 'intentClassifier' && nodeOutput.intent) {
