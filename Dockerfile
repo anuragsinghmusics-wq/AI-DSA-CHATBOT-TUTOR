@@ -8,6 +8,8 @@ RUN npm install --legacy-peer-deps
 
 COPY backend .
 
+RUN npx prisma generate
+
 RUN npm run build
 
 EXPOSE 3001
