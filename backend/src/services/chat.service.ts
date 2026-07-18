@@ -27,6 +27,21 @@ async function getDevUserId(): Promise<string> {
 }
 
 /**
+ * Safely decode a JSON-encoded token.
+ * Handles edge cases where the token might already be decoded.
+ */
+function decodeToken(jsonToken: string): string {
+  try {
+    const decoded = JSON.parse(jsonToken);
+    // Ensure we return a string, not an object
+    return typeof decoded === 'string' ? decoded : String(decoded);
+  } catch {
+    // If JSON parsing fails, the token was not JSON-encoded, return as-is
+    return jsonToken;
+  }
+}
+
+/**
  * Chat service — orchestrates the AI pipeline and persists messages.
  * This is the main business logic layer.
  */
@@ -87,25 +102,29 @@ export class ChatService {
 
       for await (const event of pipeline) {
         if (event.type === 'token') {
-          // ✅ FIX: event.data is JSON.stringify(char), so we must parse it back
+          // ✅ FIXED: event.data is JSON.stringify(char), decode it properly
           // before accumulating into fullResponse, otherwise DB gets '"a""b""c"' instead of 'abc'
-          try {
-            const decoded = JSON.parse(event.data);
-            fullResponse += typeof decoded === 'string' ? decoded : event.data;
-          } catch {
-            fullResponse += event.data;
-          }
+          const decodedChar = decodeToken(event.data);
+          fullResponse += decodedChar;
+
           // Forward the raw JSON-encoded token to the SSE stream (frontend parses it)
           yield { type: 'token', data: event.data };
         } else if (event.type === 'intent') {
           intent = event.data;
+          logger.debug('Intent classified', { intent });
         } else if (event.type === 'safety') {
           wasSafe = event.data === 'safe';
+          logger.debug('Safety result', { wasSafe });
         } else if (event.type === 'error') {
           logger.error('Pipeline error', { error: event.data });
           yield { type: 'error', data: event.data };
           return;
         }
+      }
+
+      // Validate that we received a response
+      if (!fullResponse) {
+        throw new Error('AI pipeline returned empty response');
       }
 
       // 5. Save the complete assistant response to DB
