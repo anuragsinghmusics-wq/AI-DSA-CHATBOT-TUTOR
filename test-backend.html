@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Test Page</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background-color: #f9fafb; color: #333; }
+        .card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h1 { color: #111827; }
+        h2 { margin-top: 0; color: #1f2937; font-size: 1.25rem; }
+        button { padding: 10px 16px; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 6px; font-weight: 500; transition: background 0.2s; }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        pre { background: #1f2937; color: #f8f8f2; padding: 16px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; min-height: 50px; font-size: 0.9rem; }
+        input[type="text"] { padding: 10px 12px; width: 70%; margin-right: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; }
+        .loading { color: #6b7280; font-style: italic; display: none; margin-left: 12px; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .note { font-size: 0.85rem; color: #6b7280; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Backend Tester</h1>
+    <p>Target URL: <strong>https://ai-dsa-chatbot-tutor-production.up.railway.app</strong></p>
+    <p class="note">Make sure your Railway environment has <code>CORS_ORIGIN</code> set correctly (e.g., <code>*</code> for testing) or this page might get blocked by CORS.</p>
+    
+    <div class="card">
+        <h2>1. Health Check</h2>
+        <p>Test if the backend server is running and reachable.</p>
+        <button id="health-btn" onclick="checkHealth()">Test /health Endpoint</button>
+        <span id="health-loading" class="loading">Fetching...</span>
+        <pre id="health-result">Result will appear here...</pre>
+    </div>
+
+    <div class="card">
+        <h2>2. Chat Test</h2>
+        <p>Test the <code>/api/chat</code> endpoint with dummy problem data.</p>
+        <div style="display: flex; margin-bottom: 12px;">
+            <input type="text" id="chat-input" placeholder="Say 'hi' or ask a DSA question..." value="Hi, can you help me with Two Sum?" />
+            <button id="chat-btn" onclick="testChat()">Send Message</button>
+        </div>
+        <span id="chat-loading" class="loading">Waiting for stream...</span>
+        <pre id="chat-result">Result will appear here...</pre>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://ai-dsa-chatbot-tutor-production.up.railway.app';
+
+        async function checkHealth() {
+            const resultEl = document.getElementById('health-result');
+            const loadingEl = document.getElementById('health-loading');
+            const btn = document.getElementById('health-btn');
+            
+            resultEl.textContent = '';
+            resultEl.className = '';
+            loadingEl.style.display = 'inline';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${BASE_URL}/health`);
+                const data = await response.json();
+                resultEl.textContent = JSON.stringify(data, null, 2);
+                if (response.ok) {
+                    resultEl.classList.add('success');
+                } else {
+                    resultEl.classList.add('error');
+                }
+            } catch (error) {
+                resultEl.textContent = `Fetch Error: ${error.message}\n\nIf the server is up, this might be a CORS issue. Check the browser console.`;
+                resultEl.classList.add('error');
+            } finally {
+                loadingEl.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        async function testChat() {
+            const resultEl = document.getElementById('chat-result');
+            const loadingEl = document.getElementById('chat-loading');
+            const message = document.getElementById('chat-input').value;
+            const btn = document.getElementById('chat-btn');
+            
+            if (!message) return;
+
+            resultEl.textContent = '';
+            resultEl.className = '';
+            loadingEl.style.display = 'inline';
+            btn.disabled = true;
+
+            const payload = {
+                message: message,
+                problemContext: {
+                    id: "dummy-1",
+                    title: "Two Sum",
+                    description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
+                    constraints: ["2 <= nums.length <= 10^4"],
+                    examples: [
+                        { input: "nums = [2,7,11,15], target = 9", output: "[0,1]" }
+                    ],
+                    difficulty: "EASY",
+                    tags: ["Array", "Hash Table"]
+                }
+            };
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                loadingEl.style.display = 'none';
+
+                if (!response.ok) {
+                    const text = await response.text();
+                    resultEl.textContent = `HTTP Error ${response.status}: ${text}`;
+                    resultEl.classList.add('error');
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Handling SSE stream line by line if applicable
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, { stream: true });
+                    resultEl.textContent += chunk;
+                    
+                    // Scroll to bottom
+                    resultEl.scrollTop = resultEl.scrollHeight;
+                }
+
+            } catch (error) {
+                loadingEl.style.display = 'none';
+                resultEl.textContent = `Fetch Error: ${error.message}\n\nCheck if CORS is properly configured in your Railway environment variables.`;
+                resultEl.classList.add('error');
+            } finally {
+                btn.disabled = false;
+                loadingEl.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
