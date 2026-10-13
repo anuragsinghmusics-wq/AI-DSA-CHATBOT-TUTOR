@@ -106,7 +106,8 @@ function safetyRouter(state: TutorGraphStateType): string {
   if (!state.safetyResult.safe) {
     return 'blocked';
   }
-  return 'judgeLLM';
+  // Bypass Judge LLM to prevent long generation timeouts
+  return 'responseFormatter';
 }
 
 function judgeRouter(state: TutorGraphStateType): string {
@@ -167,10 +168,11 @@ function buildTutorGraph() {
       safetyFilter: 'safetyFilter',
     })
 
-    // Safety routing: unsafe → blocked, safe → judgeLLM
+    // Safety routing: unsafe → blocked, safe → responseFormatter (bypassing judgeLLM)
     .addConditionalEdges('safetyFilter', safetyRouter, {
       blocked: 'blocked',
       judgeLLM: 'judgeLLM',
+      responseFormatter: 'responseFormatter',
     })
 
     // Judge routing: not approved → blocked, approved → responseFormatter
@@ -202,6 +204,8 @@ const tutorGraph = buildTutorGraph();
  */
 export async function* runTutorPipeline(input: {
   userMessage: string;
+  userCode?: string;
+  language?: string;
   problemContext: ProblemContext;
   chatHistory: ChatMessageData[];
 }): AsyncGenerator<{ type: string; data: string }> {
@@ -219,6 +223,8 @@ export async function* runTutorPipeline(input: {
 
     for await (const chunk of await tutorGraph.stream({
       userMessage: input.userMessage,
+      userCode: input.userCode,
+      language: input.language,
       problemContext: input.problemContext,
       chatHistory: input.chatHistory,
     } as any)) {

@@ -15,6 +15,8 @@ export async function sendChatMessage(
   problemId: string | undefined,
   message: string,
   problemContext: ProblemContext,
+  userCode: string,
+  language: string,
   sessionId?: string,
   onToken: (token: string) => void = () => {},
   onDone: (data: { messageId: string; intent: string; wasSafe: boolean }) => void = () => {},
@@ -32,6 +34,8 @@ export async function sendChatMessage(
       body: JSON.stringify({
         problemId,
         message,
+        userCode,
+        language,
         problemContext,
         sessionId,
       }),
@@ -173,4 +177,24 @@ export async function getProblemById(id: string): Promise<ProblemContext> {
   if (!res.ok) throw new Error('Failed to fetch problem');
   const data = await res.json();
   return data.data.context || data.data;
+}
+
+/**
+ * Run code via the Piston execution engine.
+ */
+export async function runCode(
+  code: string,
+  language: string,
+  stdin?: string
+): Promise<{ stdout: string; stderr: string; exitCode: number; language: string }> {
+  const res = await fetch(`${API_BASE}/run`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, language, stdin: stdin || '' }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Run failed' }));
+    throw new Error(err.error || `HTTP ${res.status}`);
+  }
+  return res.json();
 }

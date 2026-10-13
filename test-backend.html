@@ -91,8 +91,9 @@
 
             const payload = {
                 message: message,
+                userCode: "function twoSum(nums, target) {\n    for(let i=0; i<=nums.length; i++) {\n        // I am stuck here\n    }\n}",
                 problemContext: {
-                    id: "dummy-1",
+                    id: "1",
                     title: "Two Sum",
                     description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
                     constraints: ["2 <= nums.length <= 10^4"],
@@ -126,16 +127,41 @@
                 // Handling SSE stream line by line if applicable
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder('utf-8');
+                let buffer = '';
 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
                     
-                    const chunk = decoder.decode(value, { stream: true });
-                    resultEl.textContent += chunk;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
                     
-                    // Scroll to bottom
-                    resultEl.scrollTop = resultEl.scrollHeight;
+                    // Keep the last incomplete line in the buffer
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (line.trim() === '') continue;
+                        if (line.startsWith('data: ')) {
+                            const dataStr = line.substring(6).trim();
+                            if (dataStr === '[DONE]') continue;
+                            
+                            try {
+                                const parsed = JSON.parse(dataStr);
+                                if (typeof parsed === 'string') {
+                                    resultEl.textContent += parsed;
+                                } else if (parsed.content) {
+                                    resultEl.textContent += parsed.content;
+                                } else {
+                                    resultEl.textContent += dataStr;
+                                }
+                            } catch (e) {
+                                resultEl.textContent += dataStr;
+                            }
+                            
+                            // Scroll to bottom
+                            resultEl.scrollTop = resultEl.scrollHeight;
+                        }
+                    }
                 }
 
             } catch (error) {

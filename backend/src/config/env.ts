@@ -10,8 +10,9 @@ const envSchema = z.object({
 
   DATABASE_URL: z.string().default('file:./dev.db'),
 
-  // OpenRouter — primary LLM provider
-  OPENROUTER_API_KEY: z.string(),
+  // Gemini — primary LLM provider
+  GEMINI_API_KEY: z.string(),
+  OPENROUTER_API_KEY: z.string().optional(),
 
   // Legacy / unused keys — kept optional so the app doesn't crash if they're present
   GROQ_API_KEY: z.string().optional(),

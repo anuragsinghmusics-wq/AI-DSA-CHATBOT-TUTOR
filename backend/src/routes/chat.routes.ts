@@ -12,6 +12,8 @@ const chatRequestSchema = z.object({
   sessionId: z.string().uuid().optional(),
   problemId: z.string().optional(),
   message: z.string().min(1, 'Message cannot be empty').max(5000, 'Message too long'),
+  userCode: z.string().max(20000, 'Code too long').optional(),
+  language: z.string().optional(),
   problemContext: z.object({
     id: z.string(),
     title: z.string(),

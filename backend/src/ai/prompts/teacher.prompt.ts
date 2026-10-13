@@ -8,7 +8,9 @@ export function buildTeacherPrompt(
   problemContext: ProblemContext, // Kept for signature compatibility, though context is now in SystemPrompt
   chatHistory: ChatMessageData[],
   userMessage: string,
-  ragContext: string = ''
+  ragContext: string = '',
+  userCode?: string,
+  language?: string
 ): string {
   const historyText =
     chatHistory.length > 0
@@ -22,12 +24,16 @@ export function buildTeacherPrompt(
     ? `\n## ADDITIONAL CONTEXT (from knowledge base)\n${ragContext}\n`
     : '';
 
+  const codeSection = userCode && userCode.trim() !== ''
+    ? `\n## STUDENT'S CURRENT CODE (${language || 'unknown language'})\n\`\`\`${language || ''}\n${userCode}\n\`\`\`\nDo NOT give the student direct code solutions. Use their provided code to point out logical flaws or syntax errors.\n`
+    : '';
+
   return `${ragSection}## CONVERSATION HISTORY
 ${historyText}
 
 ## STUDENT'S QUESTION
 ${userMessage}
-
+${codeSection}
 ## YOUR TASK
 Answer the student's question directly, strictly adhering to the length limit:
 

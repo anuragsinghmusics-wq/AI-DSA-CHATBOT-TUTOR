@@ -9,7 +9,7 @@ import type { Message, ProblemContext } from '@/types';
  * Handles message sending, streaming responses, chat history, and
  * proper cleanup via AbortController when the user clears chat.
  */
-export function useChat(problemContext: ProblemContext | null) {
+export function useChat(problemContext: ProblemContext | null, userCode: string, language: string) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | undefined>();
@@ -59,6 +59,8 @@ export function useChat(problemContext: ProblemContext | null) {
           problemContext.id,
           content.trim(),
           problemContext,
+          userCode,
+          language,
           sessionId,
           // onToken — append each character to the streaming message
           (token: string) => {
@@ -126,7 +128,7 @@ export function useChat(problemContext: ProblemContext | null) {
         setIsLoading(false);
       }
     },
-    [problemContext, isLoading, sessionId]
+    [problemContext, isLoading, sessionId, userCode, language]
   );
 
   /**

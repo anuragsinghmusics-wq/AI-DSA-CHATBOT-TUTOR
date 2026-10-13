@@ -55,7 +55,7 @@ export class ChatService {
     data: string;
     messageId?: string;
   }> {
-    const { problemId, message, problemContext, sessionId: existingSessionId } = request;
+    const { problemId, message, userCode, language, problemContext, sessionId: existingSessionId } = request;
 
     try {
       // Get (or cache) the dev user ID
@@ -96,6 +96,8 @@ export class ChatService {
 
       const pipeline = runTutorPipeline({
         userMessage: message,
+        userCode,
+        language,
         problemContext,
         chatHistory,
       });

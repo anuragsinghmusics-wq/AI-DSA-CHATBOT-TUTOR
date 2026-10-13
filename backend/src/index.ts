@@ -6,6 +6,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { logger } from './utils/logger.js';
 import chatRoutes from './routes/chat.routes.js';
 import problemRoutes from './routes/problem.routes.js';
+import runRoutes from './routes/run.routes.js';
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get('/health', (_req, res) => {
 // ---- API Routes ----
 app.use('/api/chat', chatRoutes);
 app.use('/api/problems', problemRoutes);
+app.use('/api/run', runRoutes);
 
 // ---- Error Handler ----
 app.use(errorHandler);
@@ -35,15 +37,22 @@ app.use(errorHandler);
 // ---- Start Server ----
 async function start() {
   try {
-    // Initialize RAG Service (Loads/builds Vector Store)
-    await ragService.init();
-
+    // Start HTTP server immediately — don't block on HuggingFace/RAG model load
     app.listen(env.PORT, () => {
       logger.info(`🚀 Deebug API running on port ${env.PORT}`);
       logger.info(`📋 Environment: ${env.NODE_ENV}`);
       logger.info('🤖 AI Engine: Gemini 2.5 Flash (via Google GenAI)');
       logger.info('🔍 Safety: Regex filter + Heuristic detector + Judge LLM');
     });
+
+    // Initialize RAG Service in the background (non-blocking)
+    // HuggingFace transformer model load can take 3-10s — no reason to delay server startup
+    ragService.init().then(() => {
+      logger.info('✅ RAG Service initialized in background');
+    }).catch((err) => {
+      logger.warn('⚠️ RAG Service failed to initialize — chat will have reduced context', { error: err });
+    });
+
   } catch (error) {
     logger.error('Failed to start server', { error });
     process.exit(1);

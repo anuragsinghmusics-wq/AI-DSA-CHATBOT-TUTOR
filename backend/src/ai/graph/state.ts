@@ -19,6 +19,14 @@ export const TutorGraphState = Annotation.Root({
     reducer: (_prev, next) => next,
     default: () => '',
   }),
+  userCode: Annotation<string | undefined>({
+    reducer: (_prev, next) => next,
+    default: () => undefined,
+  }),
+  language: Annotation<string | undefined>({
+    reducer: (_prev, next) => next,
+    default: () => undefined,
+  }),
   problemContext: Annotation<ProblemContext>({
     reducer: (_prev, next) => next,
     default: () => ({

@@ -22,10 +22,15 @@ export interface ProblemContext {
   examples: ProblemExample[];
   difficulty: Difficulty;
   tags: string[];
+  companies?: string[];
   category?: string;
   acceptanceRate?: number;
   likes?: number;
   dislikes?: number;
+  /** Map of language slug → starter function snippet (from LeetCode) */
+  codeSnippets?: Record<string, string>;
+  /** Raw example test cases string from LeetCode */
+  exampleTestcases?: string;
 }
 
 export interface ProblemListItem {
@@ -33,6 +38,7 @@ export interface ProblemListItem {
   title: string;
   difficulty: Difficulty;
   tags: string[];
+  companies?: string[];
 }
 
 export interface Message {

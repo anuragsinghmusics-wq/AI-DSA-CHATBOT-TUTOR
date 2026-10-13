@@ -20,7 +20,9 @@ export async function promptBuilderNode(
         state.problemContext,
         state.chatHistory,
         state.userMessage,
-        state.ragContext
+        state.ragContext,
+        state.userCode,
+        state.language
       );
 
   logger.debug('Prompt constructed', {

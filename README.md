@@ -18,6 +18,7 @@
 
   <p>
     <a href="#-features">Features</a> •
+    <a href="#-dsa-sheet--mnc-filters">DSA Sheet & Company Filters</a> •
     <a href="#-architecture">Architecture</a> •
     <a href="#-tech-stack">Tech Stack</a> •
     <a href="#-quick-start">Quick Start</a> •
@@ -30,17 +31,19 @@
 
 ## 🎯 What is Deebug?
 
-**Deebug** is a full-stack AI chatbot that acts as your personal DSA (Data Structures & Algorithms) tutor. Unlike a simple code generator, Deebug is engineered to **teach, not cheat** — it uses a multi-stage AI pipeline to provide Socratic-style guidance, hints, and conceptual explanations without ever writing code for you.
+**Deebug** is a full-stack AI chatbot and structured practice platform engineered to act as your personal DSA (Data Structures & Algorithms) tutor. Unlike a simple code generator, Deebug is built to **teach, not cheat** — it uses a multi-stage AI pipeline to provide Socratic-style guidance, hints, and conceptual explanations without ever writing code for you.
 
-> 💡 **Philosophy**: The best way to master DSA is to struggle productively. Deebug keeps you in that sweet spot — challenged but never lost.
+> 💡 **Philosophy**: The best way to master DSA is to struggle productively. Deebug keeps you in that sweet spot — challenged, supported, but never handed the answer.
 
 **Key highlights:**
 - 🧠 **LangGraph-powered AI pipeline** with 11 interconnected nodes
 - 🛡️ **5-layer safety system** that actively prevents code leakage
 - ⚡ **Real-time SSE token streaming** for a natural, typing-effect response
-- 📊 **LeetCode problem bank** with semantic search via FAISS vector embeddings
-- 🗂️ **Persistent chat history** with session management (SQLite + Prisma)
-- 🎨 **Monaco Code Editor** integration for users to share their code attempts
+- 📚 **A2Z-Style DSA Problem Sheet** with curated topic roadmaps and progress tracking
+- 🏢 **MNC Company Filter** covering top interview questions from Amazon, Google, Meta, Microsoft, Apple, Netflix, Uber, Bloomberg, Adobe
+- 🎨 **Modern Orange & White Theme** designed for long study sessions with crisp contrast and zero clutter
+- 💻 **Integrated Code Editor & Code Runner** with custom input testing
+- 📊 **LeetCode problem bank (2,900+ problems)** with semantic RAG concept retrieval
 
 ---
 
@@ -49,13 +52,50 @@
 | Feature | Description |
 |---|---|
 | 🤖 **Smart Intent Classifier** | Detects if you're asking for a concept, hint, code review, debugging help, or trying to extract a solution |
-| 🚫 **Anti-Cheat Engine** | 5-layer pipeline ensuring the AI never gives away answers directly |
-| 💬 **Streaming Responses** | Answers stream token-by-token via Server-Sent Events for a fluid UX |
-| 🔍 **RAG Context Injection** | Retrieves relevant DSA concepts from a FAISS vector store to enrich answers |
-| 📝 **Session Persistence** | All conversations are saved per-problem, per-user in SQLite |
-| ⭐ **Feedback System** | Users can rate responses to improve quality over time |
-| 🖥️ **Integrated Code Editor** | Monaco Editor embedded in the UI — paste your attempt and get a review |
-| 📂 **Problem Library** | 3000+ LeetCode problems seeded from CSV, searchable by difficulty & tags |
+| 🚫 **Anti-Cheat Engine** | 5-layer pipeline ensuring the AI never gives away code or answers directly |
+| 💬 **Streaming Responses** | Answers stream token-by-token via Server-Sent Events (SSE) for a fluid UX |
+| 📚 **A2Z DSA Problem Sheet** | Structured topic roadmaps (Arrays, Linked Lists, Trees, DP, Graphs) with completion tracking |
+| 🏢 **MNC Company Filter** | Filter problems asked in interviews by Amazon, Google, Meta, Microsoft, Apple, Netflix, Uber, Bloomberg, Adobe |
+| 🏷️ **Collapsible Meta Tags** | Clean header pills for `Topics ▾` and `Companies ▾` showing question tags and company interview history |
+| 🔍 **RAG Context Injection** | Retrieves relevant DSA concepts from vector embeddings to enrich explanations |
+| 📝 **Notepad & Revision** | Keep personal notes per problem and star questions for quick revision |
+| 🖥️ **Code Runner & Editor** | Monaco-powered editor with syntax highlighting, language selection, and execution against custom inputs |
+| ⭐ **Feedback System** | Rate AI responses to continuously improve tutoring quality |
+
+---
+
+## 📚 DSA Sheet & MNC Filters
+
+The platform includes a dedicated **DSA Problem Sheet** (`/sheet`) modeled after top-tier interview roadmaps:
+
+### 1. Topic Roadmaps
+Problems are organized into progressive topics:
+- **Learn the Basics** (Syntax, Math, Basic Recursion)
+- **Arrays & Hashing** (Sliding Window, Prefix Sums, Two Pointers)
+- **Binary Search** (1D Arrays, Answer Space, Rotated Arrays)
+- **Strings** (Palindromes, Anagrams, String Matching)
+- **Linked Lists** (Singly, Doubly, Fast & Slow Pointers)
+- **Recursion & Backtracking** (Subsets, Combinations, Permutations)
+- **Bit Manipulation** (Bitwise Tricks, Submasks)
+- **Stacks & Queues** (Monotonic Stack, Sliding Window Max)
+- **Trees & Binary Search Trees** (Traversals, LCA, Views)
+- **Graphs** (BFS, DFS, Dijkstra, Topo Sort, Disjoint Set)
+- **Dynamic Programming** (1D, 2D, DP on Trees/Stocks, Digit DP)
+- **Tries, Heaps & Advanced** (Priority Queues, Segment Trees)
+
+### 2. MNC Company Question Filtering
+Directly filter questions asked in technical interviews by top tech MNCs with live question counters:
+- 🛍️ **Amazon (AMZN)**
+- 🔍 **Google (GOOG)**
+- 🌐 **Meta (META)**
+- 💻 **Microsoft (MSFT)**
+- 🍎 **Apple (AAPL)**
+- 🎬 **Netflix (NFLX)**
+- 🚗 **Uber (UBER)**
+- 📊 **Bloomberg (BLMB)**
+- 🎨 **Adobe (ADBE)**
+
+Each problem row features company badges (e.g. `AMZN`, `GOOG`, `META`) and single-click row navigation to jump straight into practice.
 
 ---
 
@@ -64,9 +104,10 @@
 ```
                         ┌─────────────────────────────────────────────────┐
                         │              User (Browser)                     │
-                        │          Next.js 14 Frontend                    │
+                        │     Next.js 14 Frontend (App Router)            │
+                        │  [/ - Problem Editor]    [/sheet - DSA Sheet]   │
                         └────────────────────┬────────────────────────────┘
-                                             │ SSE Stream
+                                             │ SSE Stream / REST API
                         ┌────────────────────▼────────────────────────────┐
                         │           Express.js REST API                   │
                         │        (Node.js + TypeScript)                   │
@@ -124,15 +165,15 @@
 
 ### 🛡️ 5-Layer Safety System
 
-The crown jewel of Deebug is its multi-stage, defense-in-depth approach to preventing solution leakage:
+Deebug enforces a defense-in-depth model to maintain educational integrity:
 
 | Layer | Mechanism | Stage |
 |---|---|---|
-| **1. Intent Classification** | LLM-based intent detection blocks `REJECTED` requests before any response is generated | Input |
-| **2. System Prompt Rules** | Strict LLM instructions embedded in every request prohibiting code output | Prompt |
-| **3. Regex Detection** | 50+ patterns detecting code syntax across 10+ programming languages | Output |
-| **4. Heuristic Analysis** | Structural analysis — semicolon density, indentation ratios, brace matching, arrow functions | Output |
-| **5. Judge LLM** | Independent secondary AI reviewer audits the Teacher LLM's response | Output |
+| **1. Intent Classification** | LLM-based intent detection flags `REJECTED` requests before responses generate | Input |
+| **2. System Prompt Rules** | Strict Socratic instructions injected into every prompt prohibiting code outputs | Prompt |
+| **3. Regex Detection** | 50+ patterns identifying function definitions, complete loops, and language syntax | Output |
+| **4. Heuristic Analysis** | Structural checks: semicolon density, brace ratios, indentation syntax | Output |
+| **5. Judge LLM** | Independent secondary AI auditor reviews generated responses for solution leakage | Output |
 
 ---
 
@@ -150,57 +191,47 @@ The crown jewel of Deebug is its multi-stage, defense-in-depth approach to preve
     <tr>
       <td><strong>Frontend</strong></td>
       <td>Next.js 14, TypeScript, TailwindCSS</td>
-      <td>App Router, SSE streaming UI, Monaco Editor</td>
+      <td>App Router, SSE streaming UI, Monaco Editor, Lucide icons</td>
     </tr>
     <tr>
       <td><strong>Backend</strong></td>
       <td>Node.js, Express.js, TypeScript</td>
-      <td>REST API, SSE endpoint, rate limiting</td>
+      <td>REST API, SSE streaming endpoints, code execution, rate limiting</td>
     </tr>
     <tr>
       <td><strong>AI Orchestration</strong></td>
       <td>LangChain.js, LangGraph.js</td>
-      <td>Stateful multi-node AI pipeline</td>
+      <td>Stateful multi-node tutor pipeline</td>
     </tr>
     <tr>
       <td><strong>LLM (Teacher)</strong></td>
-      <td>Groq (LLaMA / DeepSeek R1)</td>
-      <td>Fast inference for tutoring responses</td>
+      <td>Groq (LLaMA / DeepSeek R1) & Gemini 2.5 Flash</td>
+      <td>Ultra-low latency inference for Socratic tutoring</td>
     </tr>
     <tr>
-      <td><strong>LLM (Classifier/Judge)</strong></td>
-      <td>Google Gemini 2.5 Flash</td>
+      <td><strong>LLM (Classifier & Judge)</strong></td>
+      <td>Google Gemini 2.5 Flash / 1.5 Flash</td>
       <td>Intent classification & safety review</td>
     </tr>
     <tr>
-      <td><strong>Vector DB</strong></td>
-      <td>FAISS (faiss-node)</td>
+      <td><strong>RAG / Vector DB</strong></td>
+      <td>FAISS (faiss-node) & Transformers</td>
       <td>Semantic search over DSA concept embeddings</td>
-    </tr>
-    <tr>
-      <td><strong>Embeddings</strong></td>
-      <td>HuggingFace Transformers</td>
-      <td>Local embedding generation for RAG</td>
     </tr>
     <tr>
       <td><strong>Database</strong></td>
       <td>SQLite + Prisma ORM</td>
-      <td>Chat history, sessions, feedback</td>
+      <td>Chat sessions, message history, feedback</td>
     </tr>
     <tr>
       <td><strong>Logging</strong></td>
       <td>Winston</td>
-      <td>Structured logging across the pipeline</td>
+      <td>Structured JSON logging across services</td>
     </tr>
     <tr>
       <td><strong>Validation</strong></td>
       <td>Zod</td>
       <td>Runtime schema validation</td>
-    </tr>
-    <tr>
-      <td><strong>Deployment</strong></td>
-      <td>Docker, Railway</td>
-      <td>Containerized deployment</td>
     </tr>
   </tbody>
 </table>
@@ -229,7 +260,7 @@ cd AI-DSA-CHATBOT-TUTOR
 cp .env.example backend/.env
 ```
 
-Open `backend/.env` and fill in your keys:
+Open `backend/.env` and supply your API keys:
 
 ```env
 # Server
@@ -255,21 +286,18 @@ RATE_LIMIT_MAX_REQUESTS=30
 cd backend
 npm install
 
-# Push the database schema
+# Push database schema
 npx prisma db push
 
-# Seed the database with LeetCode problems
-npm run db:seed
-
-# Start the development server
+# Start the dev server
 npm run dev
 ```
 
-The backend will be running at **http://localhost:3001**
+The backend starts at **http://localhost:3001**.
 
 ### 4. Set Up the Frontend
 
-Open a new terminal:
+In a separate terminal window:
 
 ```bash
 cd frontend
@@ -277,27 +305,12 @@ npm install
 npm run dev
 ```
 
-The frontend will be running at **http://localhost:3000**
+The frontend runs at **http://localhost:3000**.
 
-### 5. Open the App 🎉
+### 5. Access the Platform
 
-Navigate to [http://localhost:3000](http://localhost:3000), select a problem from the library, and start your tutoring session!
-
----
-
-## 🐳 Docker Deployment
-
-A `Dockerfile` is included for containerized deployment:
-
-```bash
-# Build the image
-docker build -t deebug .
-
-# Run the container
-docker run -p 3001:3001 --env-file backend/.env deebug
-```
-
-For full-stack deployment, the project is pre-configured for **Railway** (`railway.json`).
+- **Problem Editor & AI Tutor**: [http://localhost:3000](http://localhost:3000)
+- **DSA Problem Sheet & MNC Filters**: [http://localhost:3000/sheet](http://localhost:3000/sheet)
 
 ---
 
@@ -305,50 +318,22 @@ For full-stack deployment, the project is pre-configured for **Railway** (`railw
 
 Base URL: `http://localhost:3001`
 
-### Chat
+### Chat & Tutoring
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/chat` | Send a message — returns a **Server-Sent Events** stream |
-| `GET` | `/api/chat/history/:sessionId` | Retrieve full chat history for a session |
-| `DELETE` | `/api/chat/history/:sessionId` | Delete a chat session and all its messages |
-| `POST` | `/api/chat/feedback` | Submit a thumbs-up/down + comment for a message |
-
-**`POST /api/chat` — Request Body:**
-
-```json
-{
-  "problemId": "uuid-of-the-problem",
-  "message": "Can you give me a hint on the two-pointer approach?",
-  "sessionId": "optional-existing-session-uuid",
-  "language": "python",
-  "userCode": "def twoSum(self, nums, target):\n    pass",
-  "problemContext": {
-    "id": "...",
-    "title": "Two Sum",
-    "description": "...",
-    "difficulty": "Easy",
-    "tags": "Array, Hash Table"
-  }
-}
-```
-
-**SSE Event Types:**
-
-| Event Type | Data | Description |
 |---|---|---|
-| `metadata` | `{ sessionId }` | Session ID (emitted first) |
-| `intent` | `concept` / `hint` / `debug` / `rejected` / ... | Classified intent of your message |
-| `token` | `"a"` | Individual characters of the streaming response |
-| `done` | `{ messageId, intent, wasSafe }` | Signals end of stream |
-| `error` | Error message string | Pipeline error |
+| `POST` | `/api/chat` | Send message — returns a **Server-Sent Events (SSE)** token stream |
+| `GET` | `/api/chat/history/:sessionId` | Retrieve full chat history for a session |
+| `DELETE` | `/api/chat/history/:sessionId` | Clear chat session history |
+| `POST` | `/api/chat/feedback` | Submit thumbs up/down rating and comments |
 
-### Problems
+### Problems & Execution
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/problems` | List all problems (with optional `difficulty` & `tags` query params) |
-| `GET` | `/api/problems/:id` | Get a specific problem by ID |
+|---|---|---|
+| `GET` | `/api/problems` | List problems with tags, difficulty, and company associations |
+| `GET` | `/api/problems/:id` | Fetch full problem context, constraints, examples, and snippets |
+| `POST` | `/api/run` | Execute user code with custom inputs and return runtime output |
 
 ---
 
@@ -356,119 +341,56 @@ Base URL: `http://localhost:3001`
 
 ```
 AI-DSA-CHATBOT-TUTOR/
-│
-├── 📂 frontend/                   # Next.js 14 Application
+├── 📂 frontend/                          # Next.js 14 Frontend
 │   └── src/
-│       ├── app/                   # Next.js App Router (pages, layouts)
+│       ├── app/
+│       │   ├── page.tsx                  # Main Problem Editor & AI Tutor
+│       │   ├── sheet/                    # A2Z DSA Sheet (/sheet)
+│       │   ├── layout.tsx                # App layout & font setup
+│       │   └── globals.css               # Orange/White design system
 │       ├── components/
-│       │   ├── chat/              # ChatPanel, ChatMessage, ChatInput
-│       │   ├── problem/           # ProblemView, ProblemList
-│       │   └── layout/            # AppLayout, Sidebar
-│       ├── hooks/                 # useChat (SSE streaming hook)
-│       ├── lib/                   # API client (fetch wrappers)
-│       └── types/                 # Shared TypeScript types
+│       │   ├── chat/                     # ChatPanel, ChatMessage, ChatInput
+│       │   ├── problem/                  # ProblemView, CodeEditor, NotepadView
+│       │   ├── sheet/                    # DSASheetPage, TopicSection, ProblemRow, DSAProgressPanel
+│       │   └── layout/                   # AppLayout, navigation headers
+│       ├── hooks/                        # useChat, useProgress, useNotepad
+│       ├── lib/                          # api.ts, sheetData.ts, companyData.ts
+│       └── types/                        # Shared TypeScript interfaces
 │
-└── 📂 backend/                    # Express.js API Server
+└── 📂 backend/                           # Express.js API Server
     ├── prisma/
-    │   └── schema.prisma          # Database models
+    │   └── schema.prisma                 # Database models
     └── src/
         ├── ai/
-        │   ├── graph/
-        │   │   ├── nodes/         # 11 LangGraph pipeline nodes
-        │   │   │   ├── intentClassifier.ts
-        │   │   │   ├── contextInjector.ts  (FAISS RAG)
-        │   │   │   ├── promptBuilder.ts
-        │   │   │   ├── teacherLLM.ts
-        │   │   │   ├── safetyFilter.ts
-        │   │   │   ├── judgeLLM.ts
-        │   │   │   └── responseFormatter.ts
-        │   │   ├── state.ts       # LangGraph state definition
-        │   │   └── workflow.ts    # Graph wiring & pipeline runner
-        │   ├── prompts/           # System, Intent, Teacher & Judge prompts
-        │   ├── safety/            # Regex patterns & heuristic code detector
-        │   └── llm/               # Groq & Gemini client factories
-        ├── config/                # Database & environment config
-        ├── controllers/           # Chat & Problem HTTP controllers
-        ├── services/              # Business logic (ChatService, ProblemService)
-        ├── repositories/          # Data access layer (Prisma queries)
-        ├── middleware/            # Rate limiting, error handling, CORS
-        ├── routes/                # Express route definitions
-        ├── database/              # DB seed scripts (LeetCode CSV import)
-        └── utils/                 # Logger (Winston)
-```
-
----
-
-## 🗄️ Database Schema
-
-```
-User ──────────── ChatSession ──────────── ChatMessage ──── Feedback
-  │                    │                        │
-  └── [1:many]         └── [1:many]             └── [1:many]
-                            │
-                        Problem
-```
-
-| Model | Key Fields |
-|---|---|
-| `User` | `id`, `email`, `name` |
-| `Problem` | `id`, `title`, `description`, `difficulty`, `tags` |
-| `ChatSession` | `id`, `userId`, `problemId` |
-| `ChatMessage` | `id`, `sessionId`, `role`, `content`, `intent`, `wasSafe` |
-| `Feedback` | `id`, `messageId`, `rating`, `comment` |
-
----
-
-## 🧩 LangGraph Pipeline — Node Reference
-
-The AI pipeline is a compiled **StateGraph** with conditional routing:
-
-```
-START
-  └─► intentClassifier
-         ├─► [REJECTED]   → rejectionSetup → promptBuilder → teacherLLM
-         ├─► [OFF_TOPIC]  → offTopicNode → END
-         └─► [ALLOWED]    → contextInjector → promptBuilder → teacherLLM
-                                                                    │
-                                                             ┌──────▼──────┐
-                                                             │ safetyFilter │
-                                                             └──────┬───────┘
-                                                  ┌────────────────┤
-                                            [UNSAFE]          [SAFE]
-                                                  │                │
-                                               blocked      responseFormatter
-                                                  │                │
-                                                 END             END
+        │   ├── graph/                    # 11 LangGraph nodes & workflow pipeline
+        │   ├── prompts/                  # System, Teacher, Judge & Intent prompts
+        │   ├── safety/                   # 50+ Regex patterns & heuristics
+        │   └── llm/                      # Gemini & Groq client factories
+        ├── config/                       # Environment & DB configuration
+        ├── controllers/                  # Chat, Problem & Code Run controllers
+        ├── data/                         # companyData.ts (MNC question mappings)
+        ├── repositories/                 # LeetCode parser & problem repository
+        ├── routes/                       # Express route definitions
+        ├── services/                     # ChatService, ProblemService, RAGService
+        └── utils/                        # Winston logger
 ```
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how to get started:
-
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/your-feature-name`
-3. **Commit** your changes: `git commit -m 'feat: add some feature'`
-4. **Push** to the branch: `git push origin feature/your-feature-name`
-5. **Open** a Pull Request
-
-Please follow the existing code style (TypeScript strict mode, ESLint rules).
+1. Fork the repository
+2. Create your branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
 ## 📜 License
 
-This project is licensed under the **MIT License** — see the [LICENSE](./LICENSE) file for details.
-
----
+Distributed under the **MIT License**. See [LICENSE](./LICENSE) for details.
 
 <div align="center">
-  <p>Built with ❤️ to make DSA learning less painful and more powerful.</p>
-  <p>
-    <a href="https://github.com/anuragsinghmusics-wq/AI-DSA-CHATBOT-TUTOR/issues">🐛 Report Bug</a> •
-    <a href="https://github.com/anuragsinghmusics-wq/AI-DSA-CHATBOT-TUTOR/issues">💡 Request Feature</a>
-  </p>
-  <br/>
-  <img src="https://img.shields.io/github/stars/anuragsinghmusics-wq/AI-DSA-CHATBOT-TUTOR?style=social" alt="GitHub Stars" />
+  <p>Built with ❤️ to master Data Structures & Algorithms the right way.</p>
 </div>

@@ -43,10 +43,15 @@ export interface ProblemContext {
   examples: ProblemExample[];
   difficulty: Difficulty;
   tags: string[];
+  companies?: string[];
   category?: string;
   acceptanceRate?: number;
   likes?: number;
   dislikes?: number;
+  /** Map of language slug → starter function snippet (from LeetCode) */
+  codeSnippets?: Record<string, string>;
+  /** Raw example test cases string from LeetCode */
+  exampleTestcases?: string;
 }
 
 // ---------- Chat ----------
@@ -76,6 +81,8 @@ export interface ChatRequest {
   sessionId?: string;
   problemId?: string;
   message: string;
+  userCode?: string;
+  language?: string;
   problemContext: ProblemContext;
 }
 
@@ -104,6 +111,8 @@ export interface JudgeResult {
 
 export interface GraphState {
   userMessage: string;
+  userCode?: string;
+  language?: string;
   problemContext: ProblemContext;
   chatHistory: ChatMessageData[];
   intent: Intent;
