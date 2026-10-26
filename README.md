@@ -8,22 +8,23 @@
     <img src="https://img.shields.io/badge/TypeScript-5.6-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
     <img src="https://img.shields.io/badge/Next.js-14-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
     <img src="https://img.shields.io/badge/LangGraph.js-1.4-FF6B35?style=for-the-badge&logo=langchain&logoColor=white" alt="LangGraph" />
-    <img src="https://img.shields.io/badge/Gemini_2.5_Flash-AI-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini" />
+    <img src="https://img.shields.io/badge/Gemini_3.6_Flash-AI-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini" />
     <img src="https://img.shields.io/badge/SQLite-Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" />
   </p>
 
   <p>
-    <strong>An intelligent DSA tutoring system that teaches through guided discovery — never by revealing solutions.</strong>
+    <strong>An intelligent, personalized DSA tutoring system that teaches through guided discovery — with Long-Term Memory, Multi-Session Chat, and Anti-Leak Safety.</strong>
   </p>
 
   <p>
+    <a href="#-screenshots">Screenshots</a> •
     <a href="#-features">Features</a> •
+    <a href="#-long-term-memory--personalization">Long-Term Memory</a> •
     <a href="#-dsa-sheet--mnc-filters">DSA Sheet & Company Filters</a> •
     <a href="#-architecture">Architecture</a> •
     <a href="#-tech-stack">Tech Stack</a> •
     <a href="#-quick-start">Quick Start</a> •
-    <a href="#-api-reference">API Reference</a> •
-    <a href="#-project-structure">Project Structure</a>
+    <a href="#-api-reference">API Reference</a>
   </p>
 </div>
 
@@ -31,19 +32,39 @@
 
 ## 🎯 What is Deebug?
 
-**Deebug** is a full-stack AI chatbot and structured practice platform engineered to act as your personal DSA (Data Structures & Algorithms) tutor. Unlike a simple code generator, Deebug is built to **teach, not cheat** — it uses a multi-stage AI pipeline to provide Socratic-style guidance, hints, and conceptual explanations without ever writing code for you.
+**Deebug** is a full-stack AI chatbot and structured practice platform engineered to act as your personal DSA (Data Structures & Algorithms) tutor. Unlike generic code generators that rob you of learning, Deebug is built to **teach, not cheat** — it uses a multi-stage LangGraph AI pipeline to provide Socratic-style guidance, dry runs, and conceptual hints without ever writing direct code solutions for you.
 
-> 💡 **Philosophy**: The best way to master DSA is to struggle productively. Deebug keeps you in that sweet spot — challenged, supported, but never handed the answer.
+> 💡 **Philosophy**: The best way to master DSA is to struggle productively. Deebug keeps you in that sweet spot — challenged, supported, and guided, but never handed the answer.
 
-**Key highlights:**
-- 🧠 **LangGraph-powered AI pipeline** with 11 interconnected nodes
-- 🛡️ **5-layer safety system** that actively prevents code leakage
-- ⚡ **Real-time SSE token streaming** for a natural, typing-effect response
-- 📚 **A2Z-Style DSA Problem Sheet** with curated topic roadmaps and progress tracking
-- 🏢 **MNC Company Filter** covering top interview questions from Amazon, Google, Meta, Microsoft, Apple, Netflix, Uber, Bloomberg, Adobe
-- 🎨 **Modern Orange & White Theme** designed for long study sessions with crisp contrast and zero clutter
-- 💻 **Integrated Code Editor & Code Runner** with custom input testing
-- 📊 **LeetCode problem bank (2,900+ problems)** with semantic RAG concept retrieval
+### Key Highlights:
+- 🧠 **LangGraph-Powered AI Pipeline**: 11 stateful nodes orchestrating intent analysis, RAG context, safety filters, and Socratic responses.
+- 🧬 **Persistent Long-Term Memory (LTM)**: Remembers your name, background, preferred language, recurring misconceptions, strengths, and milestones across all chats and problems.
+- 💬 **Multi-Session Chat History & "New Chat"**: Archived conversation drawer with instant session switching, previews, and persistent local storage.
+- 🛡️ **5-Layer Anti-Leak Safety System**: Input classification, strict system prompt rules, 50+ regex patterns, heuristic density checks, and a secondary Judge LLM auditor.
+- 📚 **A2Z-Style DSA Problem Sheet**: Master roadmaps (Arrays, Trees, Graphs, DP) as the primary landing page with progress tracking, difficulty filters, and search.
+- 🏢 **MNC Company Filter**: Curated tags for interview questions asked at Amazon, Google, Meta, Microsoft, Apple, Netflix, Uber, Bloomberg, and Adobe.
+- 💻 **Integrated Code Editor & Runner**: Monaco-powered workspace with syntax highlighting, custom input testing, and instant language switching.
+- ⚡ **Real-Time SSE Streaming**: Token-by-token streaming with typing effects for an authentic one-on-one tutoring feel.
+
+---
+
+## 📸 Screenshots
+
+### 1. DSA Problem Sheet (Landing Page — `/`)
+A structured problem sheet with live progress statistics, difficulty filters, MNC company tags, and topic-wise roadmaps:
+
+<div align="center">
+  <img src="./assets/sheet-preview.png" alt="Deebug DSA Problem Sheet" width="100%" />
+</div>
+
+<br/>
+
+### 2. Interactive Problem Editor & AI Tutor (`/editor`)
+Split-pane coding workspace with problem details, Monaco editor, custom testcase execution, and the Socratic AI Chatbot:
+
+<div align="center">
+  <img src="./assets/editor-preview.png" alt="Deebug Problem Editor and AI Tutor" width="100%" />
+</div>
 
 ---
 
@@ -51,51 +72,70 @@
 
 | Feature | Description |
 |---|---|
-| 🤖 **Smart Intent Classifier** | Detects if you're asking for a concept, hint, code review, debugging help, or trying to extract a solution |
-| 🚫 **Anti-Cheat Engine** | 5-layer pipeline ensuring the AI never gives away code or answers directly |
-| 💬 **Streaming Responses** | Answers stream token-by-token via Server-Sent Events (SSE) for a fluid UX |
-| 📚 **A2Z DSA Problem Sheet** | Structured topic roadmaps (Arrays, Linked Lists, Trees, DP, Graphs) with completion tracking |
-| 🏢 **MNC Company Filter** | Filter problems asked in interviews by Amazon, Google, Meta, Microsoft, Apple, Netflix, Uber, Bloomberg, Adobe |
-| 🏷️ **Collapsible Meta Tags** | Clean header pills for `Topics ▾` and `Companies ▾` showing question tags and company interview history |
-| 🔍 **RAG Context Injection** | Retrieves relevant DSA concepts from vector embeddings to enrich explanations |
-| 📝 **Notepad & Revision** | Keep personal notes per problem and star questions for quick revision |
-| 🖥️ **Code Runner & Editor** | Monaco-powered editor with syntax highlighting, language selection, and execution against custom inputs |
-| ⭐ **Feedback System** | Rate AI responses to continuously improve tutoring quality |
+| 🧠 **Long-Term Memory (LTM)** | Automatically captures student name, goals, blind spots, and milestones to personalize every session |
+| 👤 **Learner Profile & Memory Modal** | Manage personal info, skill level (Beginner/Intermediate/Advanced), target language, and custom memory notes |
+| 🗂️ **Multi-Session Chat & New Chat** | Start fresh conversations per problem while preserving past chat sessions in a slide-in drawer |
+| 🔄 **URL & Refresh Persistence** | Switching problems syncs the URL query string; page refresh retains active problem and chat context |
+| 🤖 **Smart Intent Classifier** | Distinguishes concepts, dry runs, debugging, complexity analysis, code reviews, and solution requests |
+| 🚫 **5-Layer Anti-Leak Safety** | Guarantees educational integrity by blocking full code dumps and guiding students through logic |
+| 📚 **A2Z DSA Problem Sheet** | Structured roadmaps across 2,900+ LeetCode problems with completion & revision tracking |
+| 🏢 **MNC Company Filter** | Filter problems asked in top tech company interviews (Amazon, Google, Meta, Microsoft, etc.) |
+| 💬 **Token-by-Token SSE Stream** | Server-Sent Events deliver conversational responses with real-time markdown and syntax formatting |
+| 🖥️ **Monaco Code Editor & Runner** | In-browser coding workspace with multi-language support (C++, Python, Java, JavaScript) and custom input runs |
+| 📝 **Problem Notepad** | Save persistent personal notes and revision tags per problem |
 
 ---
 
-## 📚 DSA Sheet & MNC Filters
+## 🧬 Long-Term Memory & Personalization
 
-The platform includes a dedicated **DSA Problem Sheet** (`/sheet`) modeled after top-tier interview roadmaps:
+Deebug is designed around a **User-Oriented Memory Architecture** that persists across different chat sessions, problem switches, and page refreshes:
 
-### 1. Topic Roadmaps
-Problems are organized into progressive topics:
-- **Learn the Basics** (Syntax, Math, Basic Recursion)
-- **Arrays & Hashing** (Sliding Window, Prefix Sums, Two Pointers)
-- **Binary Search** (1D Arrays, Answer Space, Rotated Arrays)
-- **Strings** (Palindromes, Anagrams, String Matching)
-- **Linked Lists** (Singly, Doubly, Fast & Slow Pointers)
-- **Recursion & Backtracking** (Subsets, Combinations, Permutations)
-- **Bit Manipulation** (Bitwise Tricks, Submasks)
-- **Stacks & Queues** (Monotonic Stack, Sliding Window Max)
-- **Trees & Binary Search Trees** (Traversals, LCA, Views)
-- **Graphs** (BFS, DFS, Dijkstra, Topo Sort, Disjoint Set)
-- **Dynamic Programming** (1D, 2D, DP on Trees/Stocks, Digit DP)
-- **Tries, Heaps & Advanced** (Priority Queues, Segment Trees)
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        User Introduces Themselves                      │
+│                e.g. "Hi, my name is Harsh and I prefer C++"            │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+        ┌───────────────────────────┴───────────────────────────┐
+        ▼                                                       ▼
+┌───────────────────────────────┐       ┌───────────────────────────────┐
+│     Immediate Name Detector   │       │   Background Reflection LLM   │
+│   - Detects name instantly    │       │   - Extracts learning styles  │
+│   - Updates Prisma User record│       │   - Discovers misconceptions  │
+│   - Immediately available     │       │   - Records milestones        │
+└───────────────┬───────────────┘       └───────────────┬───────────────┘
+                │                                       │
+                └───────────────────┬───────────────────┘
+                                    │
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│               SQLite Persistent Long-Term Memory (LTM)                │
+│    - UserProfile: name, skillLevel, preferredLanguage, learningGoals   │
+│    - UserMemory: [LEARNING_STYLE], [WEAKNESS], [STRENGTH], [MILESTONE] │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ Injected into every prompt
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                          Teacher LLM Tutor                             │
+│   "Hello Harsh! I remember you prefer C++. Let's look at Two Sum..."   │
+└────────────────────────────────────────────────────────────────────────┘
+```
 
-### 2. MNC Company Question Filtering
-Directly filter questions asked in technical interviews by top tech MNCs with live question counters:
-- 🛍️ **Amazon (AMZN)**
-- 🔍 **Google (GOOG)**
-- 🌐 **Meta (META)**
-- 💻 **Microsoft (MSFT)**
-- 🍎 **Apple (AAPL)**
-- 🎬 **Netflix (NFLX)**
-- 🚗 **Uber (UBER)**
-- 📊 **Bloomberg (BLMB)**
-- 🎨 **Adobe (ADBE)**
+- **Identity Awareness**: Tells the tutor who you are, addressing you by name and remembering your profile even in brand-new chats on different problems.
+- **Pedagogical Calibration**: Explanations adapt automatically to your chosen skill level (Beginner, Intermediate, or Advanced).
+- **Proactive Guidance**: Warns you around recurring blind spots (e.g. forgetting recursion base cases or off-by-one errors in binary search).
+- **Profile Modal**: Click **"Profile & Memory"** in the top navigation bar to inspect what the AI remembers about you or edit your name, language, and goals anytime.
 
-Each problem row features company badges (e.g. `AMZN`, `GOOG`, `META`) and single-click row navigation to jump straight into practice.
+---
+
+## 🗂️ Multi-Session Chat & "New Chat"
+
+Each problem workspace supports independent, multi-session conversation tracking:
+
+1. **New Chat Button**: Located in the chat header. Click to safely archive your current conversation and start with a clean slate.
+2. **Slide-in History Drawer (`🕐`)**: View all past chat sessions for that problem with relative timestamps (e.g., *"10m ago"*), message counts, and first-question previews.
+3. **Read-Only Session Review**: Click any past session to inspect previous discussions in a dedicated read-only view with a top banner and easy return to active chat.
+4. **Delete Session**: Hover over any archived chat to delete it individually.
 
 ---
 
@@ -105,12 +145,13 @@ Each problem row features company badges (e.g. `AMZN`, `GOOG`, `META`) and singl
                         ┌─────────────────────────────────────────────────┐
                         │              User (Browser)                     │
                         │     Next.js 14 Frontend (App Router)            │
-                        │  [/ - Problem Editor]    [/sheet - DSA Sheet]   │
+                        │    [/ - DSA Sheet]    [/editor - Coding Tutor]  │
                         └────────────────────┬────────────────────────────┘
                                              │ SSE Stream / REST API
                         ┌────────────────────▼────────────────────────────┐
                         │           Express.js REST API                   │
                         │        (Node.js + TypeScript)                   │
+                        │  - ChatService  - MemoryService  - RunService   │
                         └────────────────────┬────────────────────────────┘
                                              │
                         ┌────────────────────▼────────────────────────────┐
@@ -134,11 +175,12 @@ Each problem row features company badges (e.g. `AMZN`, `GOOG`, `META`) and singl
                         │         │              │                        │
                         │         │        ┌─────▼────────────┐          │
                         │         │        │  Prompt Builder  │          │
+                        │         │        │ (+ LTM & Profile)│          │
                         │         │        └─────┬────────────┘          │
                         │         │              │                        │
                         │         │        ┌─────▼────────────┐          │
                         │         │        │   Teacher LLM    │          │
-                        │         │        │  (Groq / Gemini) │          │
+                        │         │        │ (Gemini 3.6 Fl)  │          │
                         │         │        └─────┬────────────┘          │
                         │         │              │                        │
                         │         │   ┌──────────▼──────────────────┐   │
@@ -160,20 +202,24 @@ Each problem row features company badges (e.g. `AMZN`, `GOOG`, `META`) and singl
                                  ┌────────▼────────┐
                                  │   SQLite (via   │
                                  │   Prisma ORM)   │
+                                 │  Users, Sessions│
+                                 │  Memories, Chats│
                                  └─────────────────┘
 ```
 
-### 🛡️ 5-Layer Safety System
+---
 
-Deebug enforces a defense-in-depth model to maintain educational integrity:
+## 🛡️ 5-Layer Safety System
 
-| Layer | Mechanism | Stage |
-|---|---|---|
-| **1. Intent Classification** | LLM-based intent detection flags `REJECTED` requests before responses generate | Input |
-| **2. System Prompt Rules** | Strict Socratic instructions injected into every prompt prohibiting code outputs | Prompt |
-| **3. Regex Detection** | 50+ patterns identifying function definitions, complete loops, and language syntax | Output |
-| **4. Heuristic Analysis** | Structural checks: semicolon density, brace ratios, indentation syntax | Output |
-| **5. Judge LLM** | Independent secondary AI auditor reviews generated responses for solution leakage | Output |
+Deebug enforces an educational defense-in-depth model:
+
+| Layer | Mechanism | Stage | Description |
+|---|---|---|---|
+| **1. Intent Classification** | LLM Classifier | Input | Flags `REJECTED` queries asking directly for code or complete solutions |
+| **2. System Prompt Rules** | Socratic Prompting | Prompt | Explicitly instructs the AI to explain logic and ask guiding questions without code output |
+| **3. Regex Scanner** | 50+ Pattern Rules | Output | Flags function definitions, loop bodies, class skeletons, and language-specific syntax |
+| **4. Heuristic Analyzer** | Statistical Checks | Output | Scans semicolon density, brace ratios, and indentation patterns typical of source code |
+| **5. Judge LLM** | Independent Reviewer | Output | Secondary AI evaluates responses flagged by heuristics to confirm or clear code safety |
 
 ---
 
@@ -191,7 +237,7 @@ Deebug enforces a defense-in-depth model to maintain educational integrity:
     <tr>
       <td><strong>Frontend</strong></td>
       <td>Next.js 14, TypeScript, TailwindCSS</td>
-      <td>App Router, SSE streaming UI, Monaco Editor, Lucide icons</td>
+      <td>App Router, SSE streaming UI, Monaco Editor, Lucide icons, responsive drawer</td>
     </tr>
     <tr>
       <td><strong>Backend</strong></td>
@@ -199,39 +245,29 @@ Deebug enforces a defense-in-depth model to maintain educational integrity:
       <td>REST API, SSE streaming endpoints, code execution, rate limiting</td>
     </tr>
     <tr>
-      <td><strong>AI Orchestration</strong></td>
+      <td><strong>AI Engine</strong></td>
+      <td>Google Gemini 3.6 Flash</td>
+      <td>Ultra-low latency reasoning for Teacher, Intent Classifier, Judge, and Memory Reflection</td>
+    </tr>
+    <tr>
+      <td><strong>Orchestration</strong></td>
       <td>LangChain.js, LangGraph.js</td>
-      <td>Stateful multi-node tutor pipeline</td>
+      <td>Stateful multi-node tutor pipeline with conditional routing</td>
     </tr>
     <tr>
-      <td><strong>LLM (Teacher)</strong></td>
-      <td>Groq (LLaMA / DeepSeek R1) & Gemini 2.5 Flash</td>
-      <td>Ultra-low latency inference for Socratic tutoring</td>
-    </tr>
-    <tr>
-      <td><strong>LLM (Classifier & Judge)</strong></td>
-      <td>Google Gemini 2.5 Flash / 1.5 Flash</td>
-      <td>Intent classification & safety review</td>
-    </tr>
-    <tr>
-      <td><strong>RAG / Vector DB</strong></td>
+      <td><strong>RAG / Embeddings</strong></td>
       <td>FAISS (faiss-node) & Transformers</td>
       <td>Semantic search over DSA concept embeddings</td>
     </tr>
     <tr>
-      <td><strong>Database</strong></td>
+      <td><strong>Database & ORM</strong></td>
       <td>SQLite + Prisma ORM</td>
-      <td>Chat sessions, message history, feedback</td>
+      <td>User profiles, long-term memories, chat sessions, message history, feedback</td>
     </tr>
     <tr>
       <td><strong>Logging</strong></td>
       <td>Winston</td>
       <td>Structured JSON logging across services</td>
-    </tr>
-    <tr>
-      <td><strong>Validation</strong></td>
-      <td>Zod</td>
-      <td>Runtime schema validation</td>
     </tr>
   </tbody>
 </table>
@@ -245,7 +281,6 @@ Deebug enforces a defense-in-depth model to maintain educational integrity:
 - **Node.js** v18 or higher
 - **npm** v9+
 - A **Google AI Studio** API key ([get one here](https://aistudio.google.com/))
-- A **Groq** API key ([get one here](https://console.groq.com/))
 
 ### 1. Clone the Repository
 
@@ -256,11 +291,7 @@ cd AI-DSA-CHATBOT-TUTOR
 
 ### 2. Configure Environment Variables
 
-```bash
-cp .env.example backend/.env
-```
-
-Open `backend/.env` and supply your API keys:
+Create `backend/.env`:
 
 ```env
 # Server
@@ -271,33 +302,28 @@ CORS_ORIGIN=http://localhost:3000
 # Database
 DATABASE_URL=file:./dev.db
 
-# AI Keys
-GOOGLE_API_KEY=your_google_gemini_api_key_here
-GROQ_API_KEY=your_groq_api_key_here
+# Google Gemini API Key
+GEMINI_API_KEY=your_gemini_api_key_here
 
 # Rate Limiting
 RATE_LIMIT_WINDOW_MS=60000
 RATE_LIMIT_MAX_REQUESTS=30
 ```
 
-### 3. Set Up the Backend
+### 3. Start Backend
 
 ```bash
 cd backend
 npm install
-
-# Push database schema
 npx prisma db push
-
-# Start the dev server
 npm run dev
 ```
 
 The backend starts at **http://localhost:3001**.
 
-### 4. Set Up the Frontend
+### 4. Start Frontend
 
-In a separate terminal window:
+In a second terminal window:
 
 ```bash
 cd frontend
@@ -305,12 +331,12 @@ npm install
 npm run dev
 ```
 
-The frontend runs at **http://localhost:3000**.
+The frontend starts at **http://localhost:3000**.
 
 ### 5. Access the Platform
 
-- **Problem Editor & AI Tutor**: [http://localhost:3000](http://localhost:3000)
-- **DSA Problem Sheet & MNC Filters**: [http://localhost:3000/sheet](http://localhost:3000/sheet)
+- **DSA Problem Sheet (Default)**: [http://localhost:3000](http://localhost:3000)
+- **Problem Editor & AI Tutor**: [http://localhost:3000/editor](http://localhost:3000/editor)
 
 ---
 
@@ -327,6 +353,16 @@ Base URL: `http://localhost:3001`
 | `DELETE` | `/api/chat/history/:sessionId` | Clear chat session history |
 | `POST` | `/api/chat/feedback` | Submit thumbs up/down rating and comments |
 
+### Learner Profile & Long-Term Memory (LTM)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/user/profile` | Retrieve active learner profile, user details, and recorded LTM memories |
+| `PUT` | `/api/user/profile` | Update learner name, skill level, language, and goals |
+| `POST` | `/api/user/memories` | Manually add a learning note / memory for the AI |
+| `DELETE` | `/api/user/memories/:id` | Delete an individual memory entry |
+| `DELETE` | `/api/user/memories` | Clear all recorded memories for the user |
+
 ### Problems & Execution
 
 | Method | Endpoint | Description |
@@ -341,49 +377,46 @@ Base URL: `http://localhost:3001`
 
 ```
 AI-DSA-CHATBOT-TUTOR/
+├── 📂 assets/                            # Banner & real app screenshots
+│   ├── banner.jpg                        # Project banner
+│   ├── sheet-preview.png                 # DSA Sheet screenshot
+│   └── editor-preview.png                # Problem Editor & AI Tutor screenshot
+│
 ├── 📂 frontend/                          # Next.js 14 Frontend
 │   └── src/
 │       ├── app/
-│       │   ├── page.tsx                  # Main Problem Editor & AI Tutor
-│       │   ├── sheet/                    # A2Z DSA Sheet (/sheet)
+│       │   ├── page.tsx                  # DSA Sheet (Default landing page)
+│       │   ├── editor/                   # Problem Editor & AI Tutor (/editor)
+│       │   ├── sheet/                    # DSA Sheet route (/sheet)
 │       │   ├── layout.tsx                # App layout & font setup
 │       │   └── globals.css               # Orange/White design system
 │       ├── components/
 │       │   ├── chat/                     # ChatPanel, ChatMessage, ChatInput
 │       │   ├── problem/                  # ProblemView, CodeEditor, NotepadView
+│       │   ├── profile/                  # LearnerProfileModal (LTM & Personalization)
 │       │   ├── sheet/                    # DSASheetPage, TopicSection, ProblemRow, DSAProgressPanel
 │       │   └── layout/                   # AppLayout, navigation headers
-│       ├── hooks/                        # useChat, useProgress, useNotepad
+│       ├── hooks/                        # useChat (multi-session & persistence), useProgress, useNotepad
 │       ├── lib/                          # api.ts, sheetData.ts, companyData.ts
 │       └── types/                        # Shared TypeScript interfaces
 │
 └── 📂 backend/                           # Express.js API Server
     ├── prisma/
-    │   └── schema.prisma                 # Database models
+    │   ├── dev.db                        # SQLite database
+    │   └── schema.prisma                 # User, UserProfile, UserMemory, ChatSession models
     └── src/
         ├── ai/
         │   ├── graph/                    # 11 LangGraph nodes & workflow pipeline
         │   ├── prompts/                  # System, Teacher, Judge & Intent prompts
         │   ├── safety/                   # 50+ Regex patterns & heuristics
-        │   └── llm/                      # Gemini & Groq client factories
+        │   └── llm/                      # Gemini client factories (Gemini 3.6 Flash)
         ├── config/                       # Environment & DB configuration
-        ├── controllers/                  # Chat, Problem & Code Run controllers
-        ├── data/                         # companyData.ts (MNC question mappings)
-        ├── repositories/                 # LeetCode parser & problem repository
-        ├── routes/                       # Express route definitions
-        ├── services/                     # ChatService, ProblemService, RAGService
+        ├── controllers/                  # Chat, Problem, User & Code Run controllers
+        ├── repositories/                 # UserRepository, ChatRepository, ProblemRepository
+        ├── routes/                       # Express routes (chat, problem, user, run)
+        ├── services/                     # ChatService, MemoryService, ProblemService, RAGService
         └── utils/                        # Winston logger
 ```
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ---
 
@@ -392,5 +425,5 @@ AI-DSA-CHATBOT-TUTOR/
 Distributed under the **MIT License**. See [LICENSE](./LICENSE) for details.
 
 <div align="center">
-  <p>Built with ❤️ to master Data Structures & Algorithms the right way.</p>
+  <p>Built with ❤️ to master Data Structures & Algorithms the right way — guided, personalized, and anti-cheat.</p>
 </div>

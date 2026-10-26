@@ -6,6 +6,8 @@ import {
   type SafetyResult,
   type JudgeResult,
   type Intent,
+  type UserProfileData,
+  type UserMemoryData,
 } from '../../types/index.js';
 
 /**
@@ -40,6 +42,14 @@ export const TutorGraphState = Annotation.Root({
     }),
   }),
   chatHistory: Annotation<ChatMessageData[]>({
+    reducer: (_prev, next) => next,
+    default: () => [],
+  }),
+  userProfile: Annotation<UserProfileData | undefined>({
+    reducer: (_prev, next) => next,
+    default: () => undefined,
+  }),
+  userMemories: Annotation<UserMemoryData[]>({
     reducer: (_prev, next) => next,
     default: () => [],
   }),

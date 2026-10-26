@@ -115,17 +115,28 @@ export class ChatController {
    * GET /api/problems/:id
    */
   async getProblem(req: Request, res: Response): Promise<void> {
-    const id = req.params.id as string;
-    const problem = await problemService.getProblemById(id);
+    try {
+      const id = req.params.id as string;
+      const problem = await problemService.getProblemById(id);
 
-    if (!problem) {
-      throw createError('Problem not found', 404);
+      if (!problem) {
+        res.status(404).json({
+          success: false,
+          error: 'Problem not found',
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: problem,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve problem',
+      });
     }
-
-    res.json({
-      success: true,
-      data: problem,
-    });
   }
 }
 

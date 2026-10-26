@@ -18,8 +18,40 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   sessions ChatSession[]
+  profile  UserProfile?
+  memories UserMemory[]
 
   @@map("users")
+}
+
+model UserProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique @map("user_id")
+  skillLevel        String   @default("INTERMEDIATE") @map("skill_level")
+  preferredLanguage String   @default("cpp") @map("preferred_language")
+  learningGoals     String   @default("Master algorithm patterns and problem solving") @map("learning_goals")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UserMemory {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  category      String   // WEAKNESS, STRENGTH, LEARNING_STYLE, MILESTONE
+  content       String   
+  sourceProblem String?  @map("source_problem")
+  confidence    Float    @default(1.0)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_memories")
 }
 
 model Problem {

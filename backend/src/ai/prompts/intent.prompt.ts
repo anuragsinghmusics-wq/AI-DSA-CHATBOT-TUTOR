@@ -28,6 +28,8 @@ CLASSIFICATION RULES:
 5. If the user asks "what's wrong with my code" and includes code, classify as "code_review" (ALLOWED).
 6. If the user asks about complexity of an approach, classify as "complexity" (ALLOWED).
 7. If the message is a short greeting only (e.g. "hi", "hello", "hey", "good morning"), classify as "concept" (ALLOWED) so the tutor can reply warmly.
+8. If the user asks about their own identity, name, learning profile, past progress, or what you remember about them (e.g. "what is my name", "who am I", "what do you remember about me", "do you know my name"), classify as "concept" (ALLOWED) so the tutor can answer them using long-term memory.
+9. If the user introduces themselves or shares their name, background, or goals (e.g. "my name is Harsh", "I am preparing for Google"), classify as "concept" (ALLOWED) so the tutor can acknowledge and remember them.
 
 Respond with ONLY a JSON object in this exact format:
 {"intent": "<intent_value>", "confidence": <0.0-1.0>, "reason": "<brief reason>"}

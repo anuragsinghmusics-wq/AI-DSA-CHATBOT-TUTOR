@@ -15,14 +15,22 @@ export async function promptBuilderNode(
   logger.info('📝 Prompt Builder: Constructing prompt...');
 
   const constructedPrompt = state.isRefusalMode
-    ? buildRefusalPrompt(state.problemContext, state.chatHistory, state.userMessage)
+    ? buildRefusalPrompt(
+        state.problemContext,
+        state.chatHistory,
+        state.userMessage,
+        state.userProfile,
+        state.userMemories
+      )
     : buildTeacherPrompt(
         state.problemContext,
         state.chatHistory,
         state.userMessage,
         state.ragContext,
         state.userCode,
-        state.language
+        state.language,
+        state.userProfile,
+        state.userMemories
       );
 
   logger.debug('Prompt constructed', {
@@ -30,6 +38,8 @@ export async function promptBuilderNode(
     isRefusalMode: state.isRefusalMode,
     hasRagContext: state.ragContext.length > 0,
     historyLength: state.chatHistory.length,
+    hasProfile: Boolean(state.userProfile),
+    memoriesCount: state.userMemories?.length || 0,
   });
 
   return { constructedPrompt };

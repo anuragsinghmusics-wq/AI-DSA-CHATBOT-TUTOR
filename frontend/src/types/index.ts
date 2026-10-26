@@ -66,3 +66,37 @@ export interface SSEEvent {
   type: 'token' | 'done' | 'error' | 'metadata';
   data: string;
 }
+
+// ---------- User Profile & Long-Term Memory ----------
+
+export type MemoryCategory = 'WEAKNESS' | 'STRENGTH' | 'LEARNING_STYLE' | 'MILESTONE';
+
+export interface UserProfile {
+  id: string;
+  userId: string;
+  name?: string;
+  skillLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  preferredLanguage: string;
+  learningGoals: string;
+}
+
+export interface UserMemory {
+  id: string;
+  userId: string;
+  category: MemoryCategory;
+  content: string;
+  sourceProblem?: string | null;
+  confidence: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LearnerProfileData {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  profile: UserProfile;
+  memories: UserMemory[];
+}

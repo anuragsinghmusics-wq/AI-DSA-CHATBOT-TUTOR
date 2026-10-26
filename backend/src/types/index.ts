@@ -97,7 +97,45 @@ export interface FeedbackRequest {
   comment?: string;
 }
 
-// ---------- LangGraph State ----------
+// ---------- User Profile & Long-Term Memory ----------
+
+export type MemoryCategory = 'WEAKNESS' | 'STRENGTH' | 'LEARNING_STYLE' | 'MILESTONE';
+
+export interface UserProfileData {
+  id: string;
+  userId: string;
+  name?: string;
+  email?: string;
+  skillLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  preferredLanguage: string;
+  learningGoals: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface UserMemoryData {
+  id: string;
+  userId: string;
+  category: MemoryCategory;
+  content: string;
+  sourceProblem?: string | null;
+  confidence: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface UpdateProfileRequest {
+  name?: string;
+  skillLevel?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  preferredLanguage?: string;
+  learningGoals?: string;
+}
+
+export interface CreateMemoryRequest {
+  category: MemoryCategory;
+  content: string;
+  sourceProblem?: string;
+}
 
 export interface SafetyResult {
   safe: boolean;
@@ -115,6 +153,8 @@ export interface GraphState {
   language?: string;
   problemContext: ProblemContext;
   chatHistory: ChatMessageData[];
+  userProfile?: UserProfileData;
+  userMemories?: UserMemoryData[];
   intent: Intent;
   constructedPrompt: string;
   ragContext: string;

@@ -14,7 +14,7 @@ import {
   buildBlockedPrompt,
 } from '../prompts/teacher.prompt.js';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
-import { Intent, type ProblemContext, type ChatMessageData } from '../../types/index.js';
+import { Intent, type ProblemContext, type ChatMessageData, type UserProfileData, type UserMemoryData } from '../../types/index.js';
 import { logger } from '../../utils/logger.js';
 
 const llm = createTeacherLLM();
@@ -40,7 +40,9 @@ async function offTopicNode(
     const prompt = buildOffTopicPrompt(
       state.problemContext,
       state.chatHistory,
-      state.userMessage
+      state.userMessage,
+      state.userProfile,
+      state.userMemories
     );
     const response = await llm.invoke([
       new SystemMessage(buildSystemPrompt(state.problemContext)),
@@ -208,10 +210,14 @@ export async function* runTutorPipeline(input: {
   language?: string;
   problemContext: ProblemContext;
   chatHistory: ChatMessageData[];
+  userProfile?: UserProfileData;
+  userMemories?: UserMemoryData[];
 }): AsyncGenerator<{ type: string; data: string }> {
   logger.info('🚀 Starting tutor pipeline', {
     problem: input.problemContext.title,
     messagePreview: input.userMessage.substring(0, 100),
+    skillLevel: input.userProfile?.skillLevel,
+    memoriesCount: input.userMemories?.length || 0,
   });
 
   try {
@@ -227,6 +233,8 @@ export async function* runTutorPipeline(input: {
       language: input.language,
       problemContext: input.problemContext,
       chatHistory: input.chatHistory,
+      userProfile: input.userProfile,
+      userMemories: input.userMemories || [],
     } as any)) {
       const nodeNames = Object.keys(chunk);
 

@@ -5,8 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ChatPanel } from '@/components/chat/ChatPanel';
 import { ProblemView } from '@/components/problem/ProblemView';
 import { CodeEditor, getStarterCode } from '@/components/problem/CodeEditor';
-import { getProblems, getProblemById } from '@/lib/api';
-import type { ProblemContext, ProblemListItem } from '@/types';
+import { LearnerProfileModal } from '@/components/profile/LearnerProfileModal';
+import { getProblems, getProblemById, getUserProfile } from '@/lib/api';
+import type { ProblemContext, ProblemListItem, UserProfile, UserMemory } from '@/types';
 import {
   Code2,
   ChevronDown,
@@ -16,6 +17,7 @@ import {
   Search,
   Loader2,
   Sparkles,
+  Brain,
 } from 'lucide-react';
 
 /**
@@ -41,6 +43,42 @@ export function AppLayout() {
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Learner Profile & AI Memory State
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [learnerProfile, setLearnerProfile] = useState<UserProfile | null>(null);
+  const [userMemories, setUserMemories] = useState<UserMemory[]>([]);
+
+  useEffect(() => {
+    async function loadLearnerProfile() {
+      try {
+        const data = await getUserProfile();
+        if (data?.profile) {
+          setLearnerProfile(data.profile);
+          if (data.profile.preferredLanguage) {
+            setLanguage(data.profile.preferredLanguage);
+          }
+        }
+        if (data?.memories) {
+          setUserMemories(data.memories);
+        }
+      } catch (err) {
+        console.warn('Could not load learner profile:', err);
+      }
+    }
+    loadLearnerProfile();
+  }, []);
+
+  const handleProfileUpdated = (profile: UserProfile, memories: UserMemory[]) => {
+    setLearnerProfile(profile);
+    setUserMemories(memories);
+    if (profile.preferredLanguage && profile.preferredLanguage !== language) {
+      setLanguage(profile.preferredLanguage);
+      if (selectedProblem?.codeSnippets) {
+        setUserCode(getStarterCode(selectedProblem.codeSnippets, profile.preferredLanguage));
+      }
+    }
+  };
+
   useEffect(() => {
     const deepLinkId = searchParams?.get('problemId');
 
@@ -51,6 +89,9 @@ export function AppLayout() {
 
         const targetId = deepLinkId || (data.length > 0 ? data[0].id : null);
         if (targetId) {
+          if (typeof window !== 'undefined' && !deepLinkId) {
+            window.history.replaceState(null, '', `/editor?problemId=${targetId}`);
+          }
           setIsLoadingProblem(true);
           try {
             const problem = await getProblemById(targetId);
@@ -62,6 +103,9 @@ export function AppLayout() {
                 const first = await getProblemById(data[0].id);
                 setSelectedProblem(first);
                 setUserCode(getStarterCode(first.codeSnippets, 'cpp'));
+                if (typeof window !== 'undefined') {
+                  window.history.replaceState(null, '', `/editor?problemId=${data[0].id}`);
+                }
               } catch { /* ignore */ }
             }
           } finally {
@@ -92,6 +136,9 @@ export function AppLayout() {
   const handleSelectProblem = async (problemId: string) => {
     setIsDropdownOpen(false);
     setSearchQuery('');
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', `/editor?problemId=${problemId}`);
+    }
     setIsLoadingProblem(true);
     try {
       const problem = await getProblemById(problemId);
@@ -257,6 +304,21 @@ export function AppLayout() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Learner Profile & AI Memory Button */}
+          <button
+            onClick={() => setIsProfileModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:border-brand-400 hover:text-brand-600 hover:bg-orange-50/30 transition-all shadow-xs group"
+            title="Open Learner Profile & AI Long-Term Memory"
+          >
+            <Brain className="w-3.5 h-3.5 text-brand-500 group-hover:scale-110 transition-transform" />
+            <span>Profile & Memory</span>
+            {userMemories.length > 0 && (
+              <span className="w-4 h-4 rounded-full bg-brand-500 text-white text-[10px] font-bold flex items-center justify-center">
+                {userMemories.length}
+              </span>
+            )}
+          </button>
+
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200/80">
             <Shield className="w-3 h-3 text-emerald-600" /> 5-Layer Safety
           </div>
@@ -324,9 +386,23 @@ export function AppLayout() {
 
         {/* Right Panel — Chat */}
         <div className="flex-1 min-w-0 bg-white">
-          <ChatPanel problemContext={selectedProblem} userCode={userCode} language={language} />
+          <ChatPanel
+            problemContext={selectedProblem}
+            userCode={userCode}
+            language={language}
+            learnerProfile={learnerProfile}
+            memoryCount={userMemories.length}
+            onOpenProfile={() => setIsProfileModalOpen(true)}
+          />
         </div>
       </div>
+
+      {/* Learner Profile & AI Memory Modal */}
+      <LearnerProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        onProfileUpdated={handleProfileUpdated}
+      />
     </div>
   );
 }

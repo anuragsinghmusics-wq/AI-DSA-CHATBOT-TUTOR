@@ -1,4 +1,5 @@
 import { chatRepository } from '../repositories/chat.repository.js';
+import { memoryService } from './memory.service.js';
 import { runTutorPipeline } from '../ai/graph/workflow.js';
 import { logger } from '../utils/logger.js';
 import type { ChatRequest, ProblemContext, ChatMessageData } from '../types/index.js';
@@ -83,11 +84,44 @@ export class ChatService {
         createdAt: msg.createdAt,
       }));
 
-      // 4. Run the LangGraph AI pipeline
-      logger.info('Running AI pipeline', {
+      // 4. Load User Profile & Long-Term Memories for personalizing the tutor
+      const userProfile = await memoryService.getUserProfile(userId);
+
+      // Fast immediate student name detection from user's message
+      // e.g. "my name is Harsh", "i am Harsh", "i'm Harsh", "call me Harsh", "myself Harsh"
+      const nameIntroMatch = message.match(/(?:my name is|i am|i'm|call me|myself)\s+([a-zA-Z]{2,20})/i);
+      if (nameIntroMatch && nameIntroMatch[1]) {
+        const candidate = nameIntroMatch[1].trim();
+        const stopWords = new Set(['stuck', 'confused', 'trying', 'solving', 'getting', 'ready', 'happy', 'new', 'writing', 'learning', 'coding', 'asking', 'wondering', 'thinking', 'here', 'back', 'just', 'sure', 'fine', 'good', 'bad', 'done', 'looking', 'not', 'very']);
+        if (!stopWords.has(candidate.toLowerCase())) {
+          const capitalized = candidate.charAt(0).toUpperCase() + candidate.slice(1);
+          try {
+            await prisma.user.update({
+              where: { id: userId },
+              data: { name: capitalized },
+            });
+            userProfile.name = capitalized;
+            await memoryService.addUserMemory(userId, {
+              category: 'LEARNING_STYLE',
+              content: `Student's name is ${capitalized}`,
+              sourceProblem: problemContext.title,
+            });
+            logger.info('👤 Immediate user name detected and saved to LTM', { userId, name: capitalized });
+          } catch (err) {
+            logger.warn('Could not auto-save user name to database', { error: err });
+          }
+        }
+      }
+
+      const userMemories = await memoryService.getUserMemories(userId, 8);
+
+      // 5. Run the LangGraph AI pipeline
+      logger.info('Running AI pipeline with LTM', {
         sessionId,
         problemTitle: problemContext.title,
         userMessage: message.substring(0, 100),
+        skillLevel: userProfile.skillLevel,
+        memoriesCount: userMemories.length,
       });
 
       let fullResponse = '';
@@ -97,9 +131,11 @@ export class ChatService {
       const pipeline = runTutorPipeline({
         userMessage: message,
         userCode,
-        language,
+        language: language || userProfile.preferredLanguage,
         problemContext,
         chatHistory,
+        userProfile,
+        userMemories,
       });
 
       for await (const event of pipeline) {
@@ -129,7 +165,7 @@ export class ChatService {
         throw new Error('AI pipeline returned empty response');
       }
 
-      // 5. Save the complete assistant response to DB
+      // 6. Save the complete assistant response to DB
       const savedMessage = await chatRepository.saveAssistantMessage(
         sessionId,
         fullResponse,
@@ -137,12 +173,35 @@ export class ChatService {
         wasSafe
       );
 
-      // 6. Emit done event with metadata
+      // 7. Emit done event with metadata
       yield {
         type: 'done',
         data: JSON.stringify({ messageId: savedMessage.id, intent, wasSafe }),
         messageId: savedMessage.id,
       };
+
+      // 8. Fire-and-forget background reflection for Long-Term Memory
+      // Analyzes student interactions to discover persistent habits/insights
+      memoryService
+        .reflectAndStoreMemory(
+          userId,
+          problemContext.title,
+          [
+            ...chatHistory,
+            {
+              id: savedMessage.id,
+              sessionId,
+              role: 'ASSISTANT' as any,
+              content: fullResponse,
+              wasSafe,
+              createdAt: new Date(),
+            },
+          ],
+          userCode
+        )
+        .catch((err) => {
+          logger.error('Background memory reflection failed', { error: err });
+        });
 
       logger.info('Chat response completed', {
         sessionId,

@@ -108,13 +108,13 @@ export function DSASheetPage() {
     const pool = unsolved.length > 0 ? unsolved : problems;
     const picked = pool[Math.floor(Math.random() * pool.length)];
     if (picked) {
-      router.push(`/?problemId=${picked.id}`);
+      router.push(`/editor?problemId=${picked.id}`);
     }
   }, [problems, getStatus, router]);
 
   const handleOpen = useCallback(
     (problemId: string) => {
-      router.push(`/?problemId=${problemId}`);
+      router.push(`/editor?problemId=${problemId}`);
     },
     [router]
   );
@@ -145,7 +145,7 @@ export function DSASheetPage() {
         {/* Nav tabs */}
         <div className="flex items-center gap-1 bg-gray-100/80 border border-gray-200 rounded-xl p-1">
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/editor')}
             className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold text-gray-600 hover:text-gray-900 hover:bg-white/60 transition-all duration-150"
           >
             <Code2 className="w-3.5 h-3.5" />

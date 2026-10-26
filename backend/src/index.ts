@@ -7,6 +7,7 @@ import { logger } from './utils/logger.js';
 import chatRoutes from './routes/chat.routes.js';
 import problemRoutes from './routes/problem.routes.js';
 import runRoutes from './routes/run.routes.js';
+import userRoutes from './routes/user.routes.js';
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.get('/health', (_req, res) => {
 app.use('/api/chat', chatRoutes);
 app.use('/api/problems', problemRoutes);
 app.use('/api/run', runRoutes);
+app.use('/api/user', userRoutes);
 
 // ---- Error Handler ----
 app.use(errorHandler);

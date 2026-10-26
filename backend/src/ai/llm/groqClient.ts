@@ -32,11 +32,23 @@ export function createJudgeLLM(): ChatGoogleGenerativeAI {
 
 /** Intent Classifier LLM: classifies user messages into allowed/rejected/off-topic. */
 export function createIntentClassifierLLM(): ChatGoogleGenerativeAI {
-  logger.debug('Creating Intent Classifier LLM (Gemini: gemini-1.5-flash-8b)');
+  logger.debug('Creating Intent Classifier LLM (Gemini: gemini-3.6-flash)');
   return new ChatGoogleGenerativeAI({
     apiKey: env.GEMINI_API_KEY,
-    modelName: 'gemini-1.5-flash-8b',
+    modelName: 'gemini-3.6-flash',
     temperature: 0,
     maxRetries: 2,
   });
 }
+
+/** Memory Reflection LLM: analyzes chat sessions in background to extract learner insights and habits. */
+export function createMemoryReflectionLLM(): ChatGoogleGenerativeAI {
+  logger.debug('Creating Memory Reflection LLM (Gemini: gemini-3.6-flash)');
+  return new ChatGoogleGenerativeAI({
+    apiKey: env.GEMINI_API_KEY,
+    modelName: 'gemini-3.6-flash',
+    temperature: 0.1,
+    maxRetries: 2,
+  });
+}
+

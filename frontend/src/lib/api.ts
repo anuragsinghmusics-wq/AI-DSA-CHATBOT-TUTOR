@@ -1,4 +1,13 @@
-import type { ProblemContext, ProblemListItem, Message, FeedbackRequest } from '@/types';
+import type {
+  ProblemContext,
+  ProblemListItem,
+  Message,
+  FeedbackRequest,
+  LearnerProfileData,
+  UserProfile,
+  UserMemory,
+  MemoryCategory,
+} from '@/types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -198,3 +207,66 @@ export async function runCode(
   }
   return res.json();
 }
+
+/**
+ * Get the current learner profile and long-term memories.
+ */
+export async function getUserProfile(): Promise<LearnerProfileData> {
+  const res = await fetch(`${API_BASE}/user/profile`);
+  if (!res.ok) throw new Error('Failed to fetch user profile');
+  const json = await res.json();
+  return json.data;
+}
+
+/**
+ * Update learner preferences (skill level, language, goals).
+ */
+export async function updateUserProfile(data: Partial<UserProfile>): Promise<UserProfile> {
+  const res = await fetch(`${API_BASE}/user/profile`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update user profile');
+  const json = await res.json();
+  return json.data;
+}
+
+/**
+ * Manually add a learning note / memory for the AI.
+ */
+export async function addUserMemory(data: {
+  category: MemoryCategory;
+  content: string;
+  sourceProblem?: string;
+}): Promise<UserMemory> {
+  const res = await fetch(`${API_BASE}/user/memories`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to add memory');
+  const json = await res.json();
+  return json.data;
+}
+
+/**
+ * Delete a specific memory by ID.
+ */
+export async function deleteUserMemory(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/user/memories/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete memory');
+}
+
+/**
+ * Clear all memories.
+ */
+export async function clearUserMemories(): Promise<void> {
+  const res = await fetch(`${API_BASE}/user/memories`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to clear memories');
+}
+

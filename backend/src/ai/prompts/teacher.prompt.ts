@@ -1,8 +1,52 @@
-import type { ProblemContext, ChatMessageData } from '../../types/index.js';
+import type { ProblemContext, ChatMessageData, UserProfileData, UserMemoryData } from '../../types/index.js';
+
+/**
+ * Format Long-Term Memory and User Profile into prompt instructions.
+ */
+function formatMemorySection(userProfile?: UserProfileData, userMemories?: UserMemoryData[]): string {
+  if (!userProfile && (!userMemories || userMemories.length === 0)) {
+    return '';
+  }
+
+  const lines: string[] = ['## STUDENT LEARNING PROFILE & LONG-TERM MEMORY'];
+
+  const hasCustomName = userProfile?.name && userProfile.name !== 'Dev User' && userProfile.name !== 'Alex (DSA Learner)';
+
+  if (userProfile) {
+    if (hasCustomName) {
+      lines.push(`- Student Name: ${userProfile.name}`);
+    }
+    lines.push(`- Skill Level: ${userProfile.skillLevel}`);
+    lines.push(`- Preferred Language: ${userProfile.preferredLanguage}`);
+    if (userProfile.learningGoals) {
+      lines.push(`- Learning Goals: ${userProfile.learningGoals}`);
+    }
+  }
+
+  if (userMemories && userMemories.length > 0) {
+    lines.push('\n### Pedagogical & Personal Insights Learned From Past Sessions:');
+    userMemories.slice(0, 10).forEach((m) => {
+      const source = m.sourceProblem ? ` (observed on: ${m.sourceProblem})` : '';
+      lines.push(`- [${m.category}] ${m.content}${source}`);
+    });
+  }
+
+  lines.push('\nPEDAGOGICAL INSTRUCTIONS BASED ON LONG-TERM MEMORY:');
+  if (hasCustomName) {
+    lines.push(`- The student's name is ${userProfile!.name}. Address them warmly by name when greeting or answering personal questions.`);
+    lines.push(`- If the student asks "what is my name", "who am I", "do you remember me", or asks what you know about them, ALWAYS answer them directly and accurately using their name and memories!`);
+  }
+  lines.push('- Calibrate the depth of your explanations and hints to this student’s skill level.');
+  lines.push('- If this student has a known WEAKNESS or misconception related to this problem, proactively guide them around that blind spot with Socratic questioning.');
+  lines.push('- If this student has a known LEARNING_STYLE (e.g. prefers dry runs or visualization), emphasize that style in your explanation.');
+  lines.push('- Acknowledge their past growth and milestones to build algorithmic confidence.\n');
+
+  return lines.join('\n') + '\n';
+}
 
 /**
  * Teacher Prompt Template.
- * Constructs the full prompt with chat history and user question.
+ * Constructs the full prompt with user profile, chat history, RAG context, and user question.
  */
 export function buildTeacherPrompt(
   problemContext: ProblemContext, // Kept for signature compatibility, though context is now in SystemPrompt
@@ -10,7 +54,9 @@ export function buildTeacherPrompt(
   userMessage: string,
   ragContext: string = '',
   userCode?: string,
-  language?: string
+  language?: string,
+  userProfile?: UserProfileData,
+  userMemories?: UserMemoryData[]
 ): string {
   const historyText =
     chatHistory.length > 0
@@ -20,6 +66,8 @@ export function buildTeacherPrompt(
           .join('\n\n')
       : 'No previous conversation.';
 
+  const memorySection = formatMemorySection(userProfile, userMemories);
+
   const ragSection = ragContext
     ? `\n## ADDITIONAL CONTEXT (from knowledge base)\n${ragContext}\n`
     : '';
@@ -28,7 +76,7 @@ export function buildTeacherPrompt(
     ? `\n## STUDENT'S CURRENT CODE (${language || 'unknown language'})\n\`\`\`${language || ''}\n${userCode}\n\`\`\`\nDo NOT give the student direct code solutions. Use their provided code to point out logical flaws or syntax errors.\n`
     : '';
 
-  return `${ragSection}## CONVERSATION HISTORY
+  return `${memorySection}${ragSection}## CONVERSATION HISTORY
 ${historyText}
 
 ## STUDENT'S QUESTION
@@ -49,7 +97,9 @@ Remember the Golden Rule: Teach the student HOW to solve the problem, do NOT sol
 export function buildRefusalPrompt(
   problemContext: ProblemContext,
   chatHistory: ChatMessageData[],
-  userMessage: string
+  userMessage: string,
+  userProfile?: UserProfileData,
+  userMemories?: UserMemoryData[]
 ): string {
   const historyText =
     chatHistory.length > 0
@@ -58,6 +108,8 @@ export function buildRefusalPrompt(
           .map((msg) => `${msg.role === 'USER' ? 'Student' : 'Tutor'}: ${msg.content}`)
           .join('\n\n')
       : 'No previous conversation.';
+
+  const memorySection = formatMemorySection(userProfile, userMemories);
 
   // Count how many times the student has already been refused in this session
   const priorRefusals = chatHistory.filter(
@@ -75,7 +127,7 @@ export function buildRefusalPrompt(
     ? `The student asked again. They may be frustrated or truly stuck. Acknowledge their persistence with empathy, firmly but warmly reiterate you cannot give code, then dig deeper — ask them specifically what part of the algorithm or logic they are finding hard. Reference something concrete from the conversation history or the problem.`
     : `The student has asked multiple times. They are clearly stuck. Be compassionate, acknowledge the frustration, then actively guide them: pick the most relevant concept from the problem's tags, give them a very targeted conceptual question or a partial thought-starter (NOT code) to unstick them. Make it feel like a one-on-one tutoring session.`;
 
-  return `## CONVERSATION HISTORY
+  return `${memorySection}## CONVERSATION HISTORY
 ${historyText}
 
 ## STUDENT'S REQUEST (asking for code/solution)
@@ -103,7 +155,9 @@ STRICT RULES for your response:
 export function buildOffTopicPrompt(
   problemContext: ProblemContext,
   chatHistory: ChatMessageData[],
-  userMessage: string
+  userMessage: string,
+  userProfile?: UserProfileData,
+  userMemories?: UserMemoryData[]
 ): string {
   const historyText =
     chatHistory.length > 0
@@ -113,23 +167,23 @@ export function buildOffTopicPrompt(
           .join('\n\n')
       : 'No previous conversation.';
 
-  return `## CONVERSATION HISTORY
+  const memorySection = formatMemorySection(userProfile, userMemories);
+
+  return `${memorySection}## CONVERSATION HISTORY
 ${historyText}
 
-## STUDENT'S OFF-TOPIC MESSAGE
+## STUDENT'S MESSAGE
 "${userMessage}"
 
-## YOUR TASK — REDIRECT THE STUDENT NATURALLY
-
-The student asked something unrelated to the active problem "${problemContext.title}".
-Your job is to acknowledge what they asked, briefly explain you're focused on DSA tutoring for this problem, and naturally redirect them back with a specific, engaging question or observation about "${problemContext.title}".
+## YOUR TASK — RESPOND NATURALLY & REDIRECT
+The student asked or said something tangential to the active problem "${problemContext.title}".
+- If the student asked about their own name, who they are, or what you remember about them: Answer them directly, accurately, and warmly using their Long-Term Memory / profile above! Then naturally link back to the problem "${problemContext.title}".
+- Otherwise: Acknowledge what they asked in 1 short sentence, and pivot naturally back to "${problemContext.title}" and its specific concepts (tags: ${problemContext.tags.join(', ')}).
 
 STRICT RULES:
 - Do NOT say "I can only assist with..." or "Let's stay focused" — these are robotic and dismissive.
-- Do NOT ignore their question entirely; briefly acknowledge it with one short sentence.
-- DO pivot naturally back to "${problemContext.title}" and its specific concepts (tags: ${problemContext.tags.join(', ')}).
 - Ask a concrete question or share an interesting observation about the problem to re-engage them.
-- Keep it to 3-4 sentences maximum. Sound like a real tutor, not a policy notice.`;
+- Keep it to 3-4 sentences maximum. Sound like a real, supportive tutor.`;
 }
 
 /**
